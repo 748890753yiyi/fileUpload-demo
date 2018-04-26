@@ -1,0 +1,22 @@
+{
+    "74dde6ba297823feb1c97a6d9d5bbd70": {
+        "type": "",
+        "lastModified": "1498748032388",
+        "name": "DNGS_GHOST_WIN7_SP1_X64_V2017_06.iso",
+        "md5": "74dde6ba297823feb1c97a6d9d5bbd70",
+        "size": 106806462,
+        "pos": 1398254719,
+        "chunks": 1,
+        "chunk": 0
+    },
+    "edc9723e95da370c5c4c979ae8caf223": {
+        "type": "application/x-msdownload",
+        "lastModified": "1509335912405",
+        "name": "jdk-8u152-windows-x64.exe",
+        "md5": "edc9723e95da370c5c4c979ae8caf223",
+        "size": 52690111,
+        "pos": 44825798,
+        "chunks": 1,
+        "chunk": 0
+    }
+}

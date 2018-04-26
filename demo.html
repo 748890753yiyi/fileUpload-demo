@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<form style="float: left;">
+    <input name="file" multiple="multiple" type="file">
+    <button id="pause" disabled="disabled">pause</button>
+    <button id="continue" disabled="disabled">continue</button>
+    <!--<progress value="0" max="1"></progress><br>-->
+    <div></div>
+
+    <h3>Config</h3>
+    <textarea cols="60" rows="30" style="font-size: medium; white-space: nowrap;"
+          onkeydown="if(event.keyCode===9){document.execCommand('insertText', null, '    ');return false;}"
+    >
+
+    </textarea>
+    <br>
+    <!--<button id="update">Update</button>-->
+</form>
+<pre style="float: left; margin-left: 40px;">
+    <code id="default-options" style="font-size: large;">
+
+    </code>
+</pre>
+<script src="bower_components/js-md5/build/md5.min.js"></script>
+<script src="mouploader.js"></script>
+<script>
+    var form = document.querySelector('form')
+    var defaultDiv = document.querySelector('#default-options')
+    var btnPause = form.querySelector('#pause')
+//    var btnUpdate = form.querySelector('#update')
+    var btnContinue = form.querySelector('#continue')
+    var inputFile = form.querySelector('input[type=file]')
+    var textarea = form.querySelector('textarea')
+//    var progress = form.querySelector('progress')
+    var div = form.querySelector('div')
+    var h3 = form.querySelector('h3')
+
+    var SIZE_50M = 1024 * 1024 * 50
+
+    /* functions begin */
+
+    function setTip(text) {
+        h3.innerText = text
+    }
+    function setProgress(val, prog) {
+        prog.value = val;
+    }
+    function setDefaultOptionText(text) {
+        defaultDiv.innerText = text
+    }
+
+    function log() {
+        console.log.apply(null, arguments)
+    }
+    function setTextArea (val) {
+        textarea.value = val;
+    }
+    function runJsonText(bindObj, text) {
+        //log(bindObj);
+        //log(text);
+        log("return "+text);
+
+        return new Function("return "+text).bind(bindObj);
+    }
+
+    function setBtnPauseDisabled(val) {
+        btnPause.disabled = !!val
+    }
+    function setBtnContinueDisabled(val) {
+        btnContinue.disabled = !!val
+    }
+    
+    function appendUploading(file, index) {
+        var html = file.name+' <progress max="1" value="0"></progress>'
+            + '<button onclick="mo.pause('+index+')">pause</button>'
+                + '<button onclick="mo.continue('+index+')">continue</button>'
+        var inner = document.createElement('div');
+        inner.innerHTML = html;
+        div.appendChild(inner);
+        return inner.querySelector('progress')
+    }
+
+    function $get(url, callback) {
+        var xhr = new XMLHttpRequest()
+        xhr.open('GET', url, true);
+        xhr.send(null);
+        xhr.addEventListener('readystatechange', function () {
+            if(xhr.readyState === 4 && xhr.status === 200) {
+                callback(xhr.responseText)
+            }
+        })
+    }
+
+    /* functions end */
+
+    /* init begin */
+
+    $get("/default_options.txt", function (text) {
+//        var json = JSON.parse(text);
+        setDefaultOptionText(text)
+    })
+    $get("/options.txt", function (text) {
+//        var json = JSON.parse(text);
+        setTextArea(text)
+    })
+
+    /* init end */
+
+    form.addEventListener('submit', function (e) {
+        e.preventDefault()
+    })
+
+    btnPause.addEventListener('click', function (e) {
+        e.preventDefault();
+        mo.pause(-1);
+        setBtnContinueDisabled(false)
+    })
+    btnContinue.addEventListener('click', function (e) {
+        e.preventDefault();
+        mo.continue(-1);
+        setBtnPauseDisabled(false)
+    })
+    inputFile.addEventListener('change', function (e) {
+        e.preventDefault();
+
+        setBtnPauseDisabled(false);
+        setBtnContinueDisabled(false);
+        var self = this;
+
+        try {
+            var a = runJsonText(this, textarea.value)();
+            mo = MoUploader(a)
+        } catch (ex) {
+            setTip(ex.message)
+        }
+
+    })
+    window.addEventListener('error', function (e) {
+        setTip(e.error.message)
+    })
+</script>
+</body>
+</html>
